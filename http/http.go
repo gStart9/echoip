@@ -384,6 +384,11 @@ func (s *Server) DefaultHandler(w http.ResponseWriter, r *http.Request) *appErro
 		return internalServerError(err)
 	}
 
+	var attribution geo.Attribution
+	if a, ok := s.gr.(geo.Attributor); ok {
+		attribution = a.Attribution()
+	}
+
 	var data = struct {
 		Response
 		Host           string
@@ -396,6 +401,7 @@ func (s *Server) DefaultHandler(w http.ResponseWriter, r *http.Request) *appErro
 		Sponsor        bool
 		ExplicitLookup bool
 		NoCustomIP     bool
+		Attribution    geo.Attribution
 	}{
 		response,
 		r.Host,
@@ -408,6 +414,7 @@ func (s *Server) DefaultHandler(w http.ResponseWriter, r *http.Request) *appErro
 		s.Sponsor,
 		!s.NoCustomIP && r.URL.Query().Has("ip"),
 		s.NoCustomIP,
+		attribution,
 	}
 	if err := t.Execute(w, &data); err != nil {
 		return internalServerError(err)

@@ -3,6 +3,7 @@ package geo
 import (
 	"math"
 	"net"
+	"strings"
 
 	geoip2 "github.com/oschwald/geoip2-golang"
 )
@@ -153,4 +154,36 @@ func (g *geoip) ASN(ip net.IP) (ASN, error) {
 
 func (g *geoip) IsEmpty() bool {
 	return g.country == nil && g.city == nil
+}
+
+// Attribution names the provider of a database's data.
+type Attribution struct {
+	Name string
+	URL  string
+}
+
+// Attributor is a Reader that names the provider of its data.
+type Attributor interface {
+	Attribution() Attribution
+}
+
+func (g *geoip) Attribution() Attribution {
+	for _, r := range []*geoip2.Reader{g.city, g.country, g.asn} {
+		if r != nil && strings.HasPrefix(r.Metadata().DatabaseType, "DBIP") {
+			return Attribution{Name: "DB-IP", URL: "https://db-ip.com"}
+		}
+	}
+	return Attribution{Name: "MaxMind GeoLite2", URL: "https://www.maxmind.com"}
+}
+
+func (g *geoip) Close() error {
+	var err error
+	for _, r := range []*geoip2.Reader{g.country, g.city, g.asn} {
+		if r != nil {
+			if cerr := r.Close(); cerr != nil {
+				err = cerr
+			}
+		}
+	}
+	return err
 }

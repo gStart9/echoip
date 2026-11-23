@@ -11,7 +11,8 @@ RUN make
 FROM scratch
 EXPOSE 8080
 
-COPY --from=build /go/bin/echoip /opt/echoip/
+COPY --from=build /go/bin/echoip /go/bin/echoip-geoupdate /opt/echoip/
+COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY html /opt/echoip/html
 
 WORKDIR /opt/echoip
