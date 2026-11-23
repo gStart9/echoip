@@ -405,3 +405,27 @@ func TestCLIMatcher(t *testing.T) {
 		}
 	}
 }
+
+func TestNoMap(t *testing.T) {
+	log.SetOutput(ioutil.Discard)
+	for _, noMap := range []bool{false, true} {
+		server := testServer()
+		server.Template = "../html"
+		server.NoMap = noMap
+		s := httptest.NewServer(server.Handler())
+		out, status, err := httpGet(s.URL+"/", "text/html", "Mozilla/5.0")
+		s.Close()
+		if err != nil {
+			t.Fatal(err)
+		}
+		if status != 200 {
+			t.Fatalf("NoMap=%t: status %d", noMap, status)
+		}
+		if got := strings.Contains(out, "openstreetmap.org"); got == noMap {
+			t.Errorf("NoMap=%t: page embeds the map: %t", noMap, got)
+		}
+		if noMap && !strings.Contains(out, "63.416667, 10.416667") {
+			t.Errorf("NoMap=%t: page omits the coordinates", noMap)
+		}
+	}
+}
