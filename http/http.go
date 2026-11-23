@@ -39,6 +39,7 @@ type Server struct {
 	profile    bool
 	Sponsor    bool
 	NoCustomIP bool
+	NoMap      bool
 }
 
 type Response struct {
@@ -396,6 +397,7 @@ func (s *Server) DefaultHandler(w http.ResponseWriter, r *http.Request) *appErro
 		Sponsor        bool
 		ExplicitLookup bool
 		NoCustomIP     bool
+		NoMap          bool
 	}{
 		response,
 		r.Host,
@@ -408,6 +410,7 @@ func (s *Server) DefaultHandler(w http.ResponseWriter, r *http.Request) *appErro
 		s.Sponsor,
 		!s.NoCustomIP && r.URL.Query().Has("ip"),
 		s.NoCustomIP,
+		s.NoMap,
 	}
 	if err := t.Execute(w, &data); err != nil {
 		return internalServerError(err)

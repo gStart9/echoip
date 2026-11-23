@@ -40,6 +40,7 @@ func main() {
 	cacheSize := flag.Int("C", 0, "Size of response cache. Set to 0 to disable")
 	profile := flag.Bool("P", false, "Enables profiling handlers")
 	sponsor := flag.Bool("s", false, "Show sponsor logo")
+	noMap := flag.Bool("n", false, "Show the coordinates as text instead of embedding an OpenStreetMap map")
 	var headers multiValueFlag
 	flag.Var(&headers, "H", "Header to trust for remote IP, if present (e.g. X-Real-IP)")
 	flag.Parse()
@@ -71,6 +72,10 @@ func main() {
 	if *sponsor {
 		log.Println("Enabling sponsor logo")
 		server.Sponsor = *sponsor
+	}
+	if *noMap {
+		log.Println("Disabling OpenStreetMap map")
+		server.NoMap = true
 	}
 	if *noCustomIP {
 		log.Println("Disabling custom IP lookup")

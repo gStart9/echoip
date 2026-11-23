@@ -151,7 +151,7 @@
           </div>
           <div>
             <h2>Location</h2>
-            {{ if .Latitude }}
+            {{ if and .Latitude (not .NoMap) }}
             <div class="map-wrapper">
               <iframe
                 width="100%"
@@ -161,6 +161,8 @@
                 src="https://www.openstreetmap.org/export/embed.html?bbox={{ .BoxLonLeft }}%2C{{ .BoxLatBottom }}%2C{{ .BoxLonRight }}%2C{{ .BoxLatTop }}&amp;layer=mapnik&amp;marker={{ .Latitude }}%2C{{ .Longitude }}"
               ></iframe>
             </div>
+            {{ else if .Latitude }}
+            <p>Coordinates: <code>{{ .Latitude }}, {{ .Longitude }}</code></p>
             {{ else }}
             <p><em>No coordinates available for this IP address.</em></p>
             {{ end }}

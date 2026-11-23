@@ -149,4 +149,5 @@ Usage of echoip:
   -s    Show sponsor logo
   -t string
         Path to template dir (default "html")
+  -n    Show the coordinates as text instead of embedding an OpenStreetMap map
 ```
