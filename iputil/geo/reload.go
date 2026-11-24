@@ -19,15 +19,17 @@ type reloading struct {
 }
 
 // Reloading opens a Reader, and opens it again whenever one of the files changes.
-// The previous Reader is closed one interval after it is replaced.
-func Reloading(open func() (Reader, error), paths []string, interval time.Duration) (Reader, error) {
+// Until the files open, it serves no GeoIP data. The previous Reader is closed
+// one interval after it is replaced.
+func Reloading(open func() (Reader, error), paths []string, interval time.Duration) Reader {
+	stamps := stampFiles(paths)
 	first, err := open()
 	if err != nil {
-		return nil, err
+		log.Printf("Serving no GeoIP data until the database files change: %s", err)
+		first = &geoip{}
 	}
 	r := &reloading{}
 	r.current.Store(&first)
-	stamps := stampFiles(paths)
 	go func() {
 		var retired Reader
 		for range time.Tick(interval) {
@@ -37,17 +39,17 @@ func Reloading(open func() (Reader, error), paths []string, interval time.Durati
 			if sameStamps(now, stamps) {
 				continue
 			}
+			stamps = now
 			next, err := open()
 			if err != nil {
 				log.Printf("Keeping the previous GeoIP database: %s", err)
 				continue
 			}
-			stamps = now
 			retired = *r.current.Swap(&next)
 			log.Printf("Reloaded GeoIP database")
 		}
 	}()
-	return r, nil
+	return r
 }
 
 func stampFiles(paths []string) []fileStamp {

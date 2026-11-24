@@ -138,7 +138,7 @@ func openGeo(countryFile, cityFile, asnFile, ipinfoFile, ipfireFile, ip2location
 		return geo.Open("", "", "")
 	case reload > 0:
 		log.Printf("Reloading databases when they change, checked every %s", reload)
-		return geo.Reloading(open, paths, reload)
+		return geo.Reloading(open, paths, reload), nil
 	default:
 		return open()
 	}
