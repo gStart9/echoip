@@ -113,10 +113,34 @@ Hub](https://hub.docker.com/r/mpolden/echoip), which can be downloaded with:
 
 ## Geolocation data
 
-`echoip` uses the MaxMind GeoIP databases to show additional information about
-IP addresses, such as registered country/city and ASN details.
+`echoip` can show additional information about IP addresses, such as their
+country, city and ASN, from one of these sources:
 
-The databases can be downloaded with:
+| Source | Signup | Data | Flags |
+| --- | --- | --- | --- |
+| [MaxMind GeoLite2](https://dev.maxmind.com/geoip/geolite2-free-geolocation-data) | account and license key | country, city, ASN | `-f`, `-c`, `-a` |
+| [DB-IP Lite](https://db-ip.com/db/lite.php) | none | country, city, ASN | `-f`, `-c`, `-a` |
+| [IPFire Location](https://www.ipfire.org/location) | none | country, ASN | `-ipfire` |
+| [IPinfo Lite](https://ipinfo.io/lite) | free token | country, ASN | `-ipinfo` |
+| [IP2Location LITE](https://lite.ip2location.com) | account and token | country, region, city, coordinates | `-ip2location` |
+
+The page credits the source of its data. Name databases from one source only.
+`-R 1h` reloads them when their files change.
+
+`echoip-geoupdate` downloads one source's databases into a directory, checks
+them (including the signature of the IPFire database) and replaces the files
+atomically:
+
+```
+$ echoip-geoupdate -source ipfire -dir data
+$ echoip -ipfire data/location.db -R 1h
+```
+
+With `-interval 24h` it keeps checking, and skips files that have not changed.
+It reads credentials from `MAXMIND_ACCOUNT_ID` and `GEOIP_LICENSE_KEY`,
+`IPINFO_TOKEN`, or `IP2LOCATION_TOKEN`.
+
+The MaxMind databases can also be downloaded with:
 
 `GEOIP_LICENSE_KEY=<key> MAXMIND_ACCOUNT_ID=<account-id> make geoip-download`
 
@@ -135,12 +159,20 @@ Usage of echoip:
   -H value
         Header to trust for remote IP, if present (e.g. X-Real-IP)
   -P    Enables profiling handlers
+  -R duration
+        Reload databases when their files change, checked at this interval. Set to 0 to disable
   -a string
         Path to GeoIP ASN database
   -c string
         Path to GeoIP city database
   -f string
         Path to GeoIP country database
+  -ip2location string
+        Path to IP2Location database (BIN)
+  -ipfire string
+        Path to IPFire Location database
+  -ipinfo string
+        Path to IPinfo Lite database (MMDB)
   -l string
         Listening address (default ":8080")
   -L    Disable custom IP lookup
