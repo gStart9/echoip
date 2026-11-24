@@ -358,7 +358,7 @@ func update(client *http.Client, source, dir string) error {
 func main() {
 	log.SetPrefix("echoip-geoupdate: ")
 	log.SetFlags(0)
-	source := flag.String("source", "", "Database source: dbip, maxmind, ipinfo, ipfire or ip2location")
+	source := flag.String("source", "dbip", "Database source: dbip, maxmind, ipinfo, ipfire or ip2location")
 	dir := flag.String("dir", ".", "Directory to write the databases into")
 	interval := flag.Duration("interval", 0, "Check for new databases at this interval. Set to 0 to check once and exit")
 	flag.Usage = func() {

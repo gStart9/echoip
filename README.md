@@ -131,12 +131,16 @@ the files change.
 
 `echoip-geoupdate` downloads one source's databases into a directory, checks
 them (including the signature of the IPFire database) and replaces the files
-atomically:
+atomically. Without `-source`, it downloads DB-IP Lite, which needs no account
+and includes cities:
 
 ```
-$ echoip-geoupdate -source ipfire -dir data
-$ echoip -ipfire data/location.db -R 1h
+$ echoip-geoupdate -dir data
+$ echoip -f data/city.mmdb -c data/city.mmdb -a data/asn.mmdb -R 1h
 ```
+
+Another source is chosen with `-source`, for example
+`echoip-geoupdate -source ipfire -dir data` and `echoip -ipfire data/location.db`.
 
 With `-interval 24h` it keeps checking, and skips files that have not changed.
 It reads credentials from `MAXMIND_ACCOUNT_ID` and `GEOIP_LICENSE_KEY`,
