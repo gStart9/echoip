@@ -125,7 +125,9 @@ country, city and ASN, from one of these sources:
 | [IP2Location LITE](https://lite.ip2location.com) | account and token | country, region, city, coordinates | `-ip2location` |
 
 The page credits the source of its data. Name databases from one source only.
-`-R 1h` reloads them when their files change.
+`-R 1h` reloads them when their files change. With `-R`, echoip also starts
+when the files are missing or unreadable, and serves no location data until
+the files change.
 
 `echoip-geoupdate` downloads one source's databases into a directory, checks
 them (including the signature of the IPFire database) and replaces the files
